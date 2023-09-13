@@ -7,6 +7,7 @@ import prisma from '@/lib/prisma';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EyeOpenIcon } from '@radix-ui/react-icons';
 import CreateCollectionBtn from '@/components/CreateCollectionBtn';
+import CollectionCard from '@/components/CollectionCard';
 
 export default async function Home() {
   return (
@@ -53,6 +54,9 @@ function WelcomeMsgFallback() {
 async function CollectionList() {
   const user = await currentUser();
   const collections = await prisma.collection.findMany({
+    include: {
+      tasks: true,
+    },
     where: {
       userId: user?.id,
     },
@@ -71,4 +75,15 @@ async function CollectionList() {
       </div>
     );
   }
+
+  return (
+    <>
+      <CreateCollectionBtn />
+      <div className="flex flex-col w-full gap-4 mt-4">
+        {collections.map((collection) => (
+          <CollectionCard key={collection.id} collection={collection} />
+        ))}
+      </div>
+    </>
+  );
 }
